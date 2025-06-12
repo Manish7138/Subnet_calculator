@@ -1,2 +1,39 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+import ipaddress  # Import Python's built-in module for IP calculations
+
+# Get user input
+ip = input("Enter an IP address: ")
+subnet_mask = input("Enter subnet mask: ")
+
+try:
+    # Combine IP and subnet mask into a network object
+    network = ipaddress.IPv4Network(f"{ip}/{subnet_mask}", strict=False)
+
+    # Network Address is calculated by performing a bitwise AND between IP and subnet mask
+    print(f"\n Network Address: {network.network_address}")
+
+    # Broadcast Address is the last address in the subnet
+    print(f" Broadcast Address: {network.broadcast_address}")
+
+    # Total number of IPs in the subnet
+    total_ips = network.num_addresses
+
+    # Usable hosts exclude the network and broadcast addresses (so -2)
+    usable_hosts = total_ips - 2 if total_ips > 2 else 0
+    print(f" Number of Usable Hosts: {usable_hosts}")
+
+    # Show usable IP range (from first to last host)
+    if usable_hosts > 0:
+        first_ip = network.network_address + 1
+        last_ip = network.broadcast_address - 1
+        print(f" Usable IP Range: {first_ip} to {last_ip}")
+    else:
+        print(" No usable IPs in this subnet.")
+
+    # Show IP and subnet in binary (for explanation)
+    ip_binary = '.'.join(f"{int(octet):08b}" for octet in ip.split('.'))
+    mask_binary = '.'.join(f"{int(octet):08b}" for octet in subnet_mask.split('.'))
+    print(f"\n IP (Binary):        {ip_binary}")
+    print(f" Subnet Mask (Binary): {mask_binary}")
+
+except ValueError as e:
+    print(f" Invalid input: {e}")
